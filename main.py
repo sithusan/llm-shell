@@ -1,4 +1,5 @@
 import os
+import argparse
 from dotenv import load_dotenv
 from google import genai
 
@@ -12,8 +13,7 @@ def main():
 
     client = genai.Client(api_key=api_key)
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents="Why is LLM Shell is so cool? Use one paragraph maximum.",
+        model="gemini-2.5-flash", contents=getUserPrompt()
     )
 
     if not response.usage_metadata:
@@ -22,6 +22,13 @@ def main():
     print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
     print(f"Response tokens:{response.usage_metadata.candidates_token_count}")
     print(f"Response: {response.text}")
+
+
+def getUserPrompt():
+    parser = argparse.ArgumentParser(description="LLM Shell")
+    parser.add_argument("user_prompt", type=str, help="User Prompt")
+
+    return parser.parse_args().user_prompt
 
 
 if __name__ == "__main__":
