@@ -2,6 +2,7 @@ import os
 import argparse
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 
 def main():
@@ -11,9 +12,11 @@ def main():
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY required")
 
+    messages = [types.Content(role="user", parts=[types.Part(text=getUserPrompt())])]
+
     client = genai.Client(api_key=api_key)
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=getUserPrompt()
+        model="gemini-2.5-flash", contents=messages
     )
 
     if not response.usage_metadata:
