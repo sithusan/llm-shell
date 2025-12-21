@@ -20,10 +20,10 @@ def get_files_info(working_directory, directory="."):
 
         result = []
         for filename in os.listdir(target_dir):
-            content_abs_path = os.path.normpath(os.path.join(target_dir, filename))
-            size = os.path.getsize(content_abs_path)
+            filename_abs = os.path.normpath(os.path.join(target_dir, filename))
+            size = os.path.getsize(filename_abs)
             result.append(
-                f"- {filename}: file_size={size} bytes, is_dir={os.path.isdir(content_abs_path)}"
+                f"- {filename}: file_size={size} bytes, is_dir={os.path.isdir(filename_abs)}"
             )
 
         return "\n".join(result)
