@@ -1,18 +1,16 @@
 import os
+from functions.helpers import get_target
+from functions.helpers import is_valid_target
 
 
 def get_files_info(working_directory, directory="."):
     try:
-        working_directory_abs = os.path.abspath(working_directory)
-        target_dir = os.path.normpath(os.path.join(working_directory_abs, directory))
-
-        is_valid_target_dir = (
-            os.path.commonpath([working_directory_abs, target_dir])
-            == working_directory_abs
+        target_dir = get_target(
+            working_directory=working_directory, target=directory
         )
 
         # Without this restriction, the LLM might run amok anywhere on the machine, reading sensitive files or overwriting important data
-        if not is_valid_target_dir:
+        if not is_valid_target(working_directory=working_directory, target=target_dir):
             return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
 
         if not os.path.isdir(target_dir):
