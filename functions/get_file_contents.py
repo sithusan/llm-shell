@@ -1,20 +1,16 @@
 import os
 import config
+from functions.helpers import get_target
+from functions.helpers import is_valid_target
 
 
 def get_file_content(working_directory, file_path):
 
     try:
-        working_directory_abs = os.path.abspath(working_directory)
-        target_file = os.path.normpath(os.path.join(working_directory_abs, file_path))
-
-        is_valid_target_file = (
-            os.path.commonpath([working_directory_abs, target_file])
-            == working_directory_abs
-        )
+        target_file = get_target(working_directory=working_directory, target=file_path)
 
         # Without this restriction, the LLM might run amok anywhere on the machine, reading sensitive files or overwriting important data
-        if not is_valid_target_file:
+        if not is_valid_target(working_directory=working_directory, target=file_path):
             return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
 
         if not os.path.isfile(target_file):
