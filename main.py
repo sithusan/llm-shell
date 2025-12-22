@@ -1,5 +1,6 @@
 import os
 import argparse
+import prompts
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -29,7 +30,9 @@ def getEnv(key):
 def getResponseFromGenAI(api_key, messages):
     client = genai.Client(api_key=api_key)
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=messages
+        model="gemini-2.5-flash",
+        contents=messages,
+        config=types.GenerateContentConfig(system_instruction=prompts.system_prompt),
     )
 
     if not response.usage_metadata:
