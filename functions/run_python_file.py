@@ -2,6 +2,7 @@ import os
 import subprocess
 from functions.helpers import get_target
 from functions.helpers import is_valid_target
+from google.genai import types
 
 
 def run_python_file(working_directory, file_path, args=None):
@@ -44,4 +45,28 @@ def run_python_file(working_directory, file_path, args=None):
         return "\n".join(result)
 
     except Exception as e:
-        f"Error: executing Python file: {e}"
+        return f"Error: executing Python file: {e}"
+
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Run the given python file",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path of the python file that want to run",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                items=types.Schema(
+                    type=types.Type.STRING,
+                    description="The arg that needs to run the python file",
+                ),
+                description="The args that need to run the python file",
+            ),
+        },
+        required=["file_path"],
+    ),
+)

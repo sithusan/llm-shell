@@ -2,6 +2,7 @@ import os
 import config
 from functions.helpers import get_target
 from functions.helpers import is_valid_target
+from google.genai import types
 
 
 def get_file_content(working_directory, file_path):
@@ -29,3 +30,19 @@ def get_file_content(working_directory, file_path):
 
     except Exception as e:
         return f"Error: {e}"
+
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Get the content of the given file",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path of the file that want to get the contents",
+            ),
+        },
+        required=["file_path"],
+    ),
+)
