@@ -62,8 +62,9 @@ def displyResponse(prompt, response):
     if response.function_calls is not None:
         for function_call in response.function_calls:
             print(f"Calling function: {function_call.name}({function_call.args})")
-    else:
-        print(f"Response: {response.text}")
+        return
+
+    print(f"Response: {response.text}")
 
 
 if __name__ == "__main__":
