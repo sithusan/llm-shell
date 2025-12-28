@@ -4,7 +4,7 @@ import prompts
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from functions.call_function import available_functions
+from functions.call_function import available_functions, call_function
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
 
     response = getResponseFromGenAI(api_key=api_key, messages=messages)
 
-    displyResponse(prompt=prompt, response=response)
+    displayResponse(prompt=prompt, response=response)
 
 
 def getEnv(key):
@@ -52,7 +52,7 @@ def getUserPrompt():
     return parser.parse_args()
 
 
-def displyResponse(prompt, response):
+def displayResponse(prompt, response):
     if prompt.verbose:
         print(f"User prompt: {prompt.user_prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
@@ -61,7 +61,19 @@ def displyResponse(prompt, response):
     # Not guarantee to be a list
     if response.function_calls is not None:
         for function_call in response.function_calls:
-            print(f"Calling function: {function_call.name}({function_call.args})")
+            result = call_function(function_call=function_call, verbose=prompt.verbose)
+            if not result.parts:
+                raise RuntimeError("No parts in the function call result")
+            if result.parts[0].function_response is None:
+                raise RuntimeError("No function response in parts")
+            if result.parts[0].function_response.response is None:
+                raise RuntimeError("No response in function response")
+
+            responses = result.parts[0]
+
+            if prompt.verbose:
+                print(f"-> {responses.function_response.response}")
+
         return
 
     print(f"Response: {response.text}")
