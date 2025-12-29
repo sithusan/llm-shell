@@ -28,7 +28,7 @@ def main():
             print(response.text)
             exit(0)
 
-        messages.append(types.Content(role="user", parts=[function_responses]))
+        messages.append(types.Content(role="user", parts=function_responses))
 
     print("Maximum calls reached")
     exit(1)
@@ -73,6 +73,8 @@ def callFunctionFromGeneratedResponse(prompt, response):
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens:{response.usage_metadata.candidates_token_count}")
 
+    responses = []
+
     # Not guarantee to be a list
     if response.function_calls is not None:
         for function_call in response.function_calls:
@@ -84,14 +86,12 @@ def callFunctionFromGeneratedResponse(prompt, response):
             if result.parts[0].function_response.response is None:
                 raise RuntimeError("No response in function response")
 
-            responses = result.parts[0]
+            responses.append(result.parts[0])
 
             if prompt.verbose:
                 print(f"-> {responses.function_response.response}")
 
-        return responses
-
-    print(f"Response: {response.text}")
+    return responses
 
 
 if __name__ == "__main__":
