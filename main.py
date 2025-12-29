@@ -14,9 +14,24 @@ def main():
     prompt = getUserPrompt()
     messages = [types.Content(role="user", parts=[types.Part(text=prompt.user_prompt)])]
 
-    response = getResponseFromGenAI(api_key=api_key, messages=messages)
+    for _ in range(20):
+        response = generateContentFromGenAI(api_key=api_key, messages=messages)
+        if response.candidates:  # list of model's response from the last prompt
+            for candidate in response.candidates:
+                messages.append(candidate.content)
 
-    displayResponse(prompt=prompt, response=response)
+        function_responses = callFunctionFromGeneratedResponse(
+            prompt=prompt, response=response
+        )
+
+        if not function_responses:  # no more function calls. Done
+            print(response.text)
+            exit(0)
+
+        messages.append(types.Content(role="user", parts=[function_responses]))
+
+    print("Maximum calls reached")
+    exit(1)
 
 
 def getEnv(key):
@@ -28,7 +43,7 @@ def getEnv(key):
     return val
 
 
-def getResponseFromGenAI(api_key, messages):
+def generateContentFromGenAI(api_key, messages):
     client = genai.Client(api_key=api_key)
     response = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -52,7 +67,7 @@ def getUserPrompt():
     return parser.parse_args()
 
 
-def displayResponse(prompt, response):
+def callFunctionFromGeneratedResponse(prompt, response):
     if prompt.verbose:
         print(f"User prompt: {prompt.user_prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
@@ -74,7 +89,7 @@ def displayResponse(prompt, response):
             if prompt.verbose:
                 print(f"-> {responses.function_response.response}")
 
-        return
+        return responses
 
     print(f"Response: {response.text}")
 

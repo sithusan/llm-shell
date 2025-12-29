@@ -43,7 +43,6 @@ def call_function(function_call, verbose=False):
 
     # ensure the working directory is still our desire directory
     args = dict(function_call.args) if function_call.args else {}
-    print(args, type(args))
     args["working_directory"] = "./calculator"
 
     result = function_map[function_name](**args)
