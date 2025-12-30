@@ -25,7 +25,7 @@ def main():
         )
 
         if not function_responses:  # no more function calls. Done
-            print(response.text)
+            print(f"Final Response: {response.text}")
             exit(0)
 
         messages.append(types.Content(role="user", parts=function_responses))
@@ -89,7 +89,7 @@ def callFunctionFromGeneratedResponse(prompt, response):
             responses.append(result.parts[0])
 
             if prompt.verbose:
-                print(f"-> {responses.function_response.response}")
+                print(f"-> {result.parts[0].function_response.response}")
 
     return responses
 
